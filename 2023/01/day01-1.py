@@ -4,7 +4,6 @@ calibration = []
 
 with open('calibration-1.txt', 'r') as content:
     for line in content:
-        line.strip()
 
         # Search first and last digit characters
         first, last = 0, 0

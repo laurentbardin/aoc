@@ -1,4 +1,5 @@
 import re
+from .SeedGenerator import SeedGenerator
 
 class Almanac:
     """
@@ -16,11 +17,9 @@ class Almanac:
     almanac = None
     map_re = re.compile(r"([a-z]+)-to-([a-z]+) map:")
 
-    def __init__(self, file):
+    def __init__(self, file, mode = 'default'):
         self.almanac = file
 
-        self.seeds = []
-        self.locations = []
         self.seed_to_soil = []
         self.soil_to_fertilizer = []
         self.fertilizer_to_water = []
@@ -29,6 +28,7 @@ class Almanac:
         self.temperature_to_humidity = []
         self.humidity_to_location = []
 
+        self.seeds = SeedGenerator(mode)
         self.parse_almanac()
 
     def parse_almanac(self):
@@ -42,7 +42,7 @@ class Almanac:
                     continue
 
                 if data.startswith('seeds:'):
-                    self.seeds = [int(s) for s in data.split(':')[1].split()]
+                    self.seeds.seeds = [int(s) for s in data.split(':')[1].split()]
                 else:
                     match self.map_re.findall(data):
                         case [(source, destination)]:
@@ -60,9 +60,8 @@ class Almanac:
         self.__dict__[prop].append((int(src), int(dest), int(rg)))
 
     def get_locations(self):
-        for seed in self.seeds:
-            self.locations.append(self.find_location(self.SEED, seed))
-        return self.locations
+        for seed in self.seeds.get_seed():
+            yield self.find_location(self.SEED, seed)
 
     def find_location(self, kind, value):
         """
@@ -116,7 +115,7 @@ class TestAlmanac(unittest.TestCase):
         cls.almanac = Almanac('example-1.txt')
 
     def test_seeds(self):
-        self.assertListEqual(self.almanac.seeds, [79, 14, 55, 13])
+        self.assertListEqual(self.almanac.seeds.seeds, [79, 14, 55, 13])
 
     def test_maps(self):
         self.assertListEqual(self.almanac.seed_to_soil,
@@ -135,4 +134,19 @@ class TestAlmanac(unittest.TestCase):
                              [(56, 60, 37), (93, 56, 4)])
 
     def test_mappings(self):
-        self.assertListEqual(self.almanac.get_locations(), [82, 43, 86, 35])
+        self.assertListEqual([l for l in self.almanac.get_locations()], [82, 43, 86, 35])
+
+class TestAlmanacWithRange(unittest.TestCase):
+    almanac = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.almanac = Almanac('example-1.txt', 'range')
+
+    def test_mappings_with_range(self):
+        self.assertListEqual(
+            [l for l in self.almanac.get_locations()],
+            [82, 83, 84, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 60, 86, 87, 88,
+             89, 94, 95, 96, 56, 57, 58, 59, 97, 98]
+        )
+

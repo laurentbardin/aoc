@@ -17,11 +17,9 @@ def find_gears(line, start, end, number):
     # Look at the line above
     for line in range(line -1, line + 2):
         for column in range(start - 1, end + 1):
-            try:
-                if gears_numbers.get(line, column):
-                    gears_numbers[(line, column)].append(number)
-            except KeyError:
-                pass
+            coord = (line, column)
+            if coord in gears_numbers:
+                gears_numbers[coord].append(number)
 
 # Find the gears first
 with open('data-1.txt', 'r') as content:

@@ -1,4 +1,4 @@
-from Almanac import Almanac
+from almanac.Almanac import Almanac
 
 def main():
     almanac = Almanac('data.txt')

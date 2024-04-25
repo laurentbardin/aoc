@@ -19,7 +19,7 @@ class Hand:
         self.cards = [Card(char) for char in self.hand]
         self.type = self.get_type()
 
-        self.bid = bid
+        self.bid = int(bid)
 
     def get_type(self):
         """

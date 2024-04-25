@@ -12,14 +12,15 @@ class Hand:
     FOUR_KIND = 5
     FIVE_KIND = 6
 
-    def __init__(self, hand, bid = 0):
+    def __init__(self, hand, bid = 0, joker_mode = False):
         assert(len(hand) == 5)
 
-        self.hand = hand.upper()
-        self.cards = [Card(char) for char in self.hand]
-        self.type = self.get_type()
-
         self.bid = int(bid)
+        self.joker_mode = joker_mode
+
+        self.hand = hand.upper()
+        self.cards = [Card(char, joker_mode) for char in self.hand]
+        self.type = self.get_type()
 
     def get_type(self):
         """
@@ -42,21 +43,42 @@ class Hand:
             else:
                 occurences[card] = 1
 
-        occurences = list(occurences.values())
-        occurences.sort()
-        match tuple(occurences):
+        card_groups = list(occurences.values())
+        card_groups.sort()
+        match tuple(card_groups):
             case (1, 1, 1, 1, 1):
-                return self.HIGH_CARD
+                if self.joker_mode and 'J' in self.hand:
+                    return self.PAIR
+                else:
+                    return self.HIGH_CARD
             case (1, 1, 1, 2):
-                return self.PAIR
+                if self.joker_mode and 'J' in self.hand:
+                    return self.THREE_KIND
+                else:
+                    return self.PAIR
             case (1, 2, 2):
-                return self.TWO_PAIR
+                if self.joker_mode and 'J' in self.hand:
+                    if occurences['J'] == 1:
+                        return self.FULL_HOUSE
+                    else:
+                        return self.FOUR_KIND
+                else:
+                    return self.TWO_PAIR
             case (1, 1, 3):
-                return self.THREE_KIND
+                if self.joker_mode and 'J' in self.hand:
+                    return self.FOUR_KIND
+                else:
+                    return self.THREE_KIND
             case (2, 3):
-                return self.FULL_HOUSE
+                if self.joker_mode and 'J' in self.hand:
+                    return self.FIVE_KIND
+                else:
+                    return self.FULL_HOUSE
             case (1, 4):
-                return self.FOUR_KIND
+                if self.joker_mode and 'J' in self.hand:
+                    return self.FIVE_KIND
+                else:
+                    return self.FOUR_KIND
             case (5, ):
                 return self.FIVE_KIND
 
@@ -94,10 +116,24 @@ class TestHand(unittest.TestCase):
         self.assertEqual(str(Hand('23kKt')), '23KKT')
 
     def test_hand_ranking(self):
-        self.assertEqual(Hand('32T3K').type, Hand.PAIR)
+        self.assertEqual(Hand('32T4J').type, Hand.HIGH_CARD)
+        self.assertEqual(Hand('32J3K').type, Hand.PAIR)
+        self.assertEqual(Hand('32JJK').type, Hand.PAIR)
         self.assertEqual(Hand('KTJJT').type, Hand.TWO_PAIR)
+        self.assertEqual(Hand('KTKJT').type, Hand.TWO_PAIR)
         self.assertEqual(Hand('T55J5').type, Hand.THREE_KIND)
         self.assertEqual(Hand('JQQQJ').type, Hand.FULL_HOUSE)
+        self.assertEqual(Hand('JQQQQ').type, Hand.FOUR_KIND)
+
+    def test_hand_ranking_with_joker(self):
+        self.assertEqual(Hand('32T4J', 0, True).type, Hand.PAIR)
+        self.assertEqual(Hand('32J3K', 0, True).type, Hand.THREE_KIND)
+        self.assertEqual(Hand('32JJK', 0, True).type, Hand.THREE_KIND)
+        self.assertEqual(Hand('KTJJT', 0, True).type, Hand.FOUR_KIND)
+        self.assertEqual(Hand('KTKJT', 0, True).type, Hand.FULL_HOUSE)
+        self.assertEqual(Hand('T55J5', 0, True).type, Hand.FOUR_KIND)
+        self.assertEqual(Hand('JQQQJ', 0, True).type, Hand.FIVE_KIND)
+        self.assertEqual(Hand('JQQQQ', 0, True).type, Hand.FIVE_KIND)
 
     def test_hand_ordering(self):
         self.assertTrue(Hand('2AAAA') < Hand('33332'))
@@ -105,3 +141,7 @@ class TestHand(unittest.TestCase):
         self.assertTrue(Hand('2AAAA') <= Hand('2AAAA'))
         self.assertFalse(Hand('2AAAA') == Hand('33332'))
         self.assertFalse(Hand('2AAAA') > Hand('33332'))
+
+    def test_hand_ordering_with_joker(self):
+        self.assertTrue(Hand('T55J5', 0, True) < Hand('QQQJA', 0, True))
+        self.assertTrue(Hand('QQQJA', 0, True) < Hand('KTJJT', 0, True))

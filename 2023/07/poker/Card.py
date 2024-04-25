@@ -2,7 +2,7 @@ import unittest
 
 class Card:
 
-    def __init__(self, label):
+    def __init__(self, label, joker = True):
         assert(label in 'AKQJT98765432')
 
         self.label = label
@@ -14,7 +14,10 @@ class Card:
             case 'Q':
                 self.value = 12
             case 'J':
-                self.value = 11
+                if joker:
+                    self.value = 1
+                else:
+                    self.value = 11
             case 'T':
                 self.value = 10
             case _:

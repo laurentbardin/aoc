@@ -62,6 +62,8 @@ class Hand:
 
     def __str__(self):
         return self.hand
+    def __repr__(self):
+        return f'{self.hand} ({self.bid})'
 
     def __eq__(self, other):
         return self.cards == other.cards
@@ -94,6 +96,8 @@ class TestHand(unittest.TestCase):
     def test_hand_ranking(self):
         self.assertEqual(Hand('32T3K').type, Hand.PAIR)
         self.assertEqual(Hand('KTJJT').type, Hand.TWO_PAIR)
+        self.assertEqual(Hand('T55J5').type, Hand.THREE_KIND)
+        self.assertEqual(Hand('JQQQJ').type, Hand.FULL_HOUSE)
 
     def test_hand_ordering(self):
         self.assertTrue(Hand('2AAAA') < Hand('33332'))

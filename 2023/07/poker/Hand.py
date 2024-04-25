@@ -17,7 +17,6 @@ class Hand:
 
         self.hand = hand.upper()
         self.cards = [Card(char) for char in self.hand]
-        self.value = sum([card.value for card in self.cards])
         self.type = self.get_type()
 
         self.bid = bid
@@ -71,9 +70,21 @@ class Hand:
             return True
         elif self.type == other.type:
             for (card, other_card) in zip(self.cards, other.cards):
-                pass
-    def __gt__(self, hand):
-        pass
+                if card == other_card:
+                    continue
+                return card < other_card
+    def __gt__(self, other):
+        if self.type > other.type:
+            return True
+        elif self.type == other.type:
+            for (card, other_card) in zip(self.cards, other.cards):
+                if card == other_card:
+                    continue
+                return card > other_card
+    def __le__(self, other):
+        return self == other or self < other
+    def __ge__(self, other):
+        return self == other or self > other
 
 class TestHand(unittest.TestCase):
 
@@ -83,3 +94,10 @@ class TestHand(unittest.TestCase):
     def test_hand_ranking(self):
         self.assertEqual(Hand('32T3K').type, Hand.PAIR)
         self.assertEqual(Hand('KTJJT').type, Hand.TWO_PAIR)
+
+    def test_hand_ordering(self):
+        self.assertTrue(Hand('2AAAA') < Hand('33332'))
+        self.assertTrue(Hand('2AAAA') == Hand('2AAAA'))
+        self.assertTrue(Hand('2AAAA') <= Hand('2AAAA'))
+        self.assertFalse(Hand('2AAAA') == Hand('33332'))
+        self.assertFalse(Hand('2AAAA') > Hand('33332'))

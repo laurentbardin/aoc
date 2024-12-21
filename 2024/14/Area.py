@@ -41,7 +41,7 @@ class Area:
 
         return self.safety_factor
 
-    def print_area(self):
+    def print(self, legend=''):
         area = [['.' for _ in range(self.width)] for _ in range(self.height)]
         for robot in self.robots:
             column = robot.position[0]
@@ -53,6 +53,8 @@ class Area:
 
         for line in area:
             print(''.join([c for c in map(str, line)]))
+        if legend:
+            print(legend)
 
 class Robot:
     def __init__(self, p, v):

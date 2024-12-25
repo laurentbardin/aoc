@@ -68,8 +68,7 @@ class Warehouse:
         coordinates = []
 
         for obj in self.objects.values():
-            if isinstance(obj, Box):
-                coordinates.append(obj.y * 100 + obj.x)
+            coordinates.append(obj.get_gps_coordinates())
 
         return sum(coordinates)
 
@@ -99,6 +98,9 @@ class Object:
             case '<':
                 self.x -= 1
 
+    def get_gps_coordinates(self):
+        return 0
+
 class Robot(Object):
     def __str__(self):
         return "@"
@@ -106,6 +108,9 @@ class Robot(Object):
 class Box(Object):
     def __str__(self):
         return "O"
+
+    def get_gps_coordinates(self):
+        return self.y * 100 + self.x
 
 class Wall(Object):
     def __str__(self):

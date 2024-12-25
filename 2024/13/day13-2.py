@@ -49,7 +49,7 @@ def solve(eq):
 
     eq[0] = [v for v in map(lambda x: x * factors[0], eq[0])]
     eq[1] = [v for v in map(lambda x: x * factors[1], eq[1])]
-    assert(eq[0][0] == eq[1][0])
+    assert eq[0][0] == eq[1][0]
 
     # Some equations may validate with a truncated value, so we must make sure
     # we actually get an integer

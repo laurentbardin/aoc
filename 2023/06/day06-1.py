@@ -32,7 +32,7 @@ def distance_traveled(race_duration):
     Generate the distances traveled for a race running for race_duration
     milliseconds.
     """
-    assert(race_duration >= 0)
+    assert race_duration >= 0
     for hold_duration in range(0, race_duration + 1):
         yield hold_duration * (race_duration - hold_duration)
 

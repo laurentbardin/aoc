@@ -48,5 +48,5 @@ class Region:
         if y < self.min_y:
             self.min_y = y
 
-        assert(self.max_x >= self.min_x)
-        assert(self.max_y >= self.min_y)
+        assert self.max_x >= self.min_x
+        assert self.max_y >= self.min_y

@@ -16,8 +16,8 @@ class Area:
             final_x = robot.position[0] + (robot.velocity[0] * seconds)
             final_y = robot.position[1] + (robot.velocity[1] * seconds)
             robot.position = (final_x % self.width, final_y % self.height)
-            assert(0 <= robot.position[0] < self.width)
-            assert(0 <= robot.position[1] < self.height)
+            assert 0 <= robot.position[0] < self.width
+            assert 0 <= robot.position[1] < self.height
 
     def get_safety_factor(self):
         if self.safety_factor is None:

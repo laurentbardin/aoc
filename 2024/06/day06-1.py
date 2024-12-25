@@ -27,7 +27,7 @@ def analyze_grid(file):
                 guard_position = [match.start(), line]
         grid.append(data)
 
-    assert(guard_position is not None)
+    assert guard_position is not None
 
     return guard_walk(guard_position, grid)
 

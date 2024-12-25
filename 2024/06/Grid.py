@@ -48,7 +48,7 @@ class Grid:
                 self.guard_position = (match.start(), y)
                 break
 
-        assert(self.guard_position is not None)
+        assert self.guard_position is not None
 
     def find_obstacles(self):
         for (y, line) in enumerate(self.grid):
@@ -161,17 +161,17 @@ class Grid:
             or self.guard == 'v' and self.guard_position[1] == self.width - 1
 
     def object_at(self, x, y):
-        assert(0 <= x < self.width and 0 <= y < self.height)
+        assert 0 <= x < self.width and 0 <= y < self.height
         return self.grid[y][x]
 
     def set_object_at(self, x, y):
-        assert(0 <= x < self.width and 0 <= y < self.height)
+        assert 0 <= x < self.width and 0 <= y < self.height
         self.grid[y][x] = '#'
         """ Reset the obstacles """
         self.find_obstacles()
 
     def unset_object_at(self, x, y):
-        assert(0 <= x < self.width and 0 <= y < self.height)
+        assert 0 <= x < self.width and 0 <= y < self.height
         self.grid[y][x] = '.'
         """ Reset the obstacles """
         self.find_obstacles()

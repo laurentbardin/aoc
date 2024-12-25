@@ -47,7 +47,7 @@ def solve(eq):
 
     eq[0] = [v for v in map(lambda x: x * factors[0], eq[0])]
     eq[1] = [v for v in map(lambda x: x * factors[1], eq[1])]
-    assert(eq[0][0] == eq[1][0])
+    assert eq[0][0] == eq[1][0]
 
     # Check the value are actual integers and not truncated floats
     button_b = (eq[0][2] - eq[1][2]) / (eq[0][1] - eq[1][1])

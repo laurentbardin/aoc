@@ -37,7 +37,7 @@ def check_pages(rules, pages):
             if r[0] in p and r[1] in p and p.index(r[0]) > p.index(r[1]):
                 break
         else:
-            assert(len(p) % 2 == 1)
+            assert len(p) % 2 == 1
             good_pages.append(p[len(p) // 2])
 
     return sum(good_pages)

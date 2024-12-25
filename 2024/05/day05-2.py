@@ -51,7 +51,7 @@ def check_pages(rules, pages):
             else:
                 correct = True
                 if corrections > 0:
-                    assert(len(p) % 2 == 1)
+                    assert len(p) % 2 == 1
                     corrected_pages.append(p[len(p) // 2])
                     corrections = 0
 

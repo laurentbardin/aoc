@@ -3,7 +3,7 @@ import unittest
 class Card:
 
     def __init__(self, label, joker = True):
-        assert(label in 'AKQJT98765432')
+        assert label in 'AKQJT98765432'
 
         self.label = label
         match label:

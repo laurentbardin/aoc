@@ -67,7 +67,7 @@ class Garden:
         plant. This allow us to progressively build the region's area and
         perimeter, if somewhat a bit brute-forcefully.
         """
-        assert(self.plot_at(x, y) == region.plant)
+        assert self.plot_at(x, y) == region.plant
         region.add_plot(x, y)
 
         for (next_x, next_y) in [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]:

@@ -27,7 +27,7 @@ class Warehouse:
                     self.objects[(x, y)] = thing
 
     def move_robot(self, direction):
-        assert(self.robot is not None)
+        assert self.robot is not None
 
         objects = self.gather_objects(self.robot.x, self.robot.y, direction)
         # Move objects in reverse order or the coordinates will be messed up

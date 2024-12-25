@@ -32,15 +32,15 @@ def defrag(files, free_blocks):
         if block_position is None:
             continue
 
-        assert(block_position < file['position'])
+        assert block_position < file['position']
         file['position'] = block_position
 
         # Update the free blocks data
         new_block_size = free_blocks[block_position] - file['size']
-        assert(new_block_size >= 0)
+        assert new_block_size >= 0
         if new_block_size > 0:
             new_position = block_position + file['size']
-            assert(new_position not in free_blocks)
+            assert new_position not in free_blocks
             free_blocks[new_position] = new_block_size
 
         del(free_blocks[block_position])

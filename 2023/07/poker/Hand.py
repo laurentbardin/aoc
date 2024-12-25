@@ -13,7 +13,7 @@ class Hand:
     FIVE_KIND = 6
 
     def __init__(self, hand, bid = 0, joker_mode = False):
-        assert(len(hand) == 5)
+        assert len(hand) == 5
 
         self.bid = int(bid)
         self.joker_mode = joker_mode

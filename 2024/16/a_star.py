@@ -1,5 +1,10 @@
 import heapq
 
+"""
+Find the best path from start to dest on grid. The direction influences both
+the cost (g) of a node and the estimation (h) for reaching goal from the
+current position.
+"""
 def solve(grid, start, dest, direction='>'):
     available = []
     available_dict = {}
@@ -13,8 +18,8 @@ def solve(grid, start, dest, direction='>'):
     start.h = start.manhattan(goal)
     start.f = start.g + start.h
 
-    heapq.heappush(available, (start.f, (start.x, start.y)))
-    available_dict[(start.x, start.y)] = start
+    heapq.heappush(available, (start.f, start.position))
+    available_dict[start.position] = start
 
     path = None
     while len(available) > 0:
@@ -77,36 +82,35 @@ def print_grid(grid, path):
 def find_neighbours(grid, node):
     candidates = []
 
+    x, y = node.position
     match node.direction:
         case '^':
-            candidates = [(node.x - 1, node.y), (node.x, node.y - 1), (node.x + 1, node.y)]
+            candidates = [(x - 1, y), (x, y - 1), (x + 1, y)]
         case '>':
-            candidates = [(node.x, node.y - 1), (node.x + 1, node.y), (node.x, node.y + 1)]
+            candidates = [(x, y - 1), (x + 1, y), (x, y + 1)]
         case 'v':
-            candidates = [(node.x + 1, node.y), (node.x, node.y + 1), (node.x - 1, node.y)]
+            candidates = [(x + 1, y), (x, y + 1), (x - 1, y)]
         case '<':
-            candidates = [(node.x, node.y + 1), (node.x - 1, node.y), (node.x, node.y - 1)]
+            candidates = [(x, y + 1), (x - 1, y), (x, y - 1)]
 
     return [c for c in candidates if not is_wall(grid, c)]
-
-def is_in_grid(grid, x, y):
-    return 1 <= x < len(grid[0]) and 1 <= y < len(grid)
 
 def is_wall(grid, position):
     x, y = position
     return grid[y][x] == '#'
 
 def update_direction(orig, to):
+    x, y = orig.position
     to_x, to_y = to
     # Same column
-    if orig.x == to_x:
-        if orig.y > to_y:
+    if x == to_x:
+        if y > to_y:
             direction = '^'
         else:
             direction = 'v'
     # Same line
-    elif orig.y == to_y:
-        if orig.x > to_x:
+    elif y == to_y:
+        if x > to_x:
             direction = '<'
         else:
             direction = '>'
@@ -117,14 +121,14 @@ def reconstruct_path(current):
     path = dict()
 
     while current is not None:
-        path[(current.x, current.y)] = current
+        path[current.position] = current
         current = current.parent
 
     return path
 
 class Node(object):
     def __init__(self, position):
-        self.x, self.y = position
+        self.position = position
 
         self.parent = None
 
@@ -136,10 +140,12 @@ class Node(object):
         self.direction = '*'
 
     def __str__(self):
-        return f"({self.x}, {self.y})"
+        return f"{self.position}"
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+        x, y = self.position
+        ox, oy = other.position
+        return x == ox and y == oy
     def __ne__(self, other):
         return not self == other
 
@@ -159,17 +165,19 @@ class Node(object):
         """
         distance = 0
 
-        diff_x = self.x - dest.x
-        diff_y = self.y - dest.y
+        x, y = self.position
+        dest_x, dest_y = dest.position
+        dx = x - dest_x
+        dy = y - dest_y
         if self.direction is not None:
-            if diff_x == 0:
+            if dx == 0:
                 # We're on the same column
                 if self.direction in '<>':
                     distance += 1000
                 elif self.direction == 'v':
                     # We'll never be above the goal node, so we're not testing for it.
                     distance += 2000
-            elif diff_y == 0:
+            elif dy == 0:
                 # We're on the same line
                 if self.direction in '^v':
                     distance += 1000
@@ -184,19 +192,20 @@ class Node(object):
                     # We have to turn twice
                     distance += 2000
 
-        return distance + abs(diff_x) + abs(diff_y)
+        return distance + abs(dx) + abs(dy)
 
-    def cost(self, position):
+    def cost(self, other):
         """
         Calculate the cost (g) of moving FROM this node TO position, taking the
         current direction into account.
         """
         cost = 1
 
-        nx, ny = position
+        x, y = self.position
+        nx, ny = other
 
-        if self.x == nx and self.direction in '<>' or \
-           self.y == ny and self.direction in '^v':
+        if x == nx and self.direction in '<>' or \
+           y == ny and self.direction in '^v':
             cost += 1000
 
         return cost

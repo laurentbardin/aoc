@@ -1,11 +1,13 @@
 import heapq
 
+from node import Node
+
 """
 Find the best path from start to dest on grid. The direction influences both
 the cost (g) of a node and the estimation (h) for reaching goal from the
 current position.
 """
-def solve(grid, start, dest, direction='>'):
+def solve(grid, start, dest, *, base_g=0, max_score=float('inf'), direction='>'):
     available = []
     available_dict = {}
     visited = set()
@@ -14,7 +16,7 @@ def solve(grid, start, dest, direction='>'):
     goal = Node(dest)
 
     start.direction = direction
-    start.g = 0
+    start.g = base_g
     start.h = start.manhattan(goal)
     start.f = start.g + start.h
 
@@ -27,15 +29,19 @@ def solve(grid, start, dest, direction='>'):
         current = available_dict[current_position]
         #print(f"Now on {current}")
 
-        #print_grid(grid, reconstruct_path(current))
-        #input("")
+        #if base_g > 0:
+        #    print_grid(grid, reconstruct_path(current), available)
+        #    print(f"Currently on {current.position}: g={current.g}, h={current.h}")
+        #    input("")
 
         if current == goal:
             #path = reconstruct_path(current)
-            #print_grid(grid, path)
-            return current.g
+            #print_grid(grid, path, available)
+            return current.g, reconstruct_path(current)
 
         visited.add(current_position)
+        if current.g > max_score:
+            continue
 
         for neighbour_position in find_neighbours(grid, current):
             if neighbour_position in visited:
@@ -45,7 +51,7 @@ def solve(grid, start, dest, direction='>'):
 
             if neighbour_position not in available_dict:
                 neighbour = Node(neighbour_position)
-                neighbour.direction = update_direction(current, neighbour_position)
+                neighbour.direction = update_direction(current.position, neighbour_position)
                 neighbour.parent = current
                 neighbour.g = tentative_g
                 neighbour.h = neighbour.manhattan(goal)
@@ -56,25 +62,72 @@ def solve(grid, start, dest, direction='>'):
                 available_dict[neighbour_position] = neighbour
             elif tentative_g < available_dict[neighbour_position].g:
                 neighbour = available_dict[neighbour_position]
-                neighbour.direction = update_direction(current, neighbour_position)
+                neighbour.direction = update_direction(current.position, neighbour_position)
                 neighbour.parent = current
                 neighbour.g = tentative_g
                 neighbour.h = neighbour.manhattan(goal)
                 neighbour.f = neighbour.g + neighbour.h
                 #print(f"Found a better path to {neighbour_position}: ", end='')
 
+
             #print(f"g={neighbour.g} h={neighbour.h} dir={neighbour.direction}")
 
     assert path is None
-    print("No path found!")
+    #print("No path found!")
 
-    return None
+    # No path found
+    return float('inf'), None
 
-def print_grid(grid, path):
+"""
+Find all the possible best paths from start to dest on grid. The first path
+found should be the best one (provided g is correcly calculated and h not
+overestimated). We then walk that best path and check any unexplored neighbour
+to see if it leads do dest without going over the score of the best path.
+Each new path found is then explored on its own until all possible alternate
+routes have been explored.
+"""
+def solve_multiple(grid, start, dest, direction='>'):
+    best_score, best_path = solve(grid, start, dest, direction=direction)
+
+    paths = [best_path]
+    nodes = set(best_path.keys())
+    available_paths = [best_path]
+    while len(available_paths) > 0:
+        path = available_paths.pop()
+
+        for position in path.keys():
+            if position == dest:
+                continue
+
+            neighbours = find_neighbours(grid, path[position])
+            for neighbour_position in neighbours:
+                if neighbour_position in path.keys():
+                    continue
+
+                node = path[position]
+                base_g = node.g + node.cost(neighbour_position)
+                direction = update_direction(node.position, neighbour_position)
+                score, new_path = solve(grid, neighbour_position, dest, base_g=base_g, direction=direction, max_score=best_score)
+                if new_path is not None:
+                    new_nodes = set(new_path.keys()) - nodes
+                    new_path = {node: new_path[node] for node in new_path.keys() if node in new_nodes}
+                    nodes |= new_nodes
+                    available_paths.append(new_path)
+                    paths.append(new_path)
+
+    return best_score, paths
+
+def print_grid(grid, path, available):
+    available_pos = [p for _, p in available]
     for (y, line) in enumerate(grid):
         for (x, c) in enumerate(line):
             if (x, y) in path:
-                print(path[(x, y)].direction, end='')
+                if isinstance(path, set):
+                    print('O', end='')
+                else:
+                    print(path[(x, y)].direction, end='')
+            elif (x, y) in available_pos:
+                print('?', end='')
             else:
                 print(c, end='')
         print()
@@ -99,8 +152,8 @@ def is_wall(grid, position):
     x, y = position
     return grid[y][x] == '#'
 
-def update_direction(orig, to):
-    x, y = orig.position
+def update_direction(position, to):
+    x, y = position
     to_x, to_y = to
     # Same column
     if x == to_x:
@@ -125,87 +178,3 @@ def reconstruct_path(current):
         current = current.parent
 
     return path
-
-class Node(object):
-    def __init__(self, position):
-        self.position = position
-
-        self.parent = None
-
-        self.g = float('inf')
-        self.h = 0
-        self.f = 0
-
-        # The direction when entering the node
-        self.direction = '*'
-
-    def __str__(self):
-        return f"{self.position}"
-
-    def __eq__(self, other):
-        x, y = self.position
-        ox, oy = other.position
-        return x == ox and y == oy
-    def __ne__(self, other):
-        return not self == other
-
-    def __gt__(self, other):
-        return self.f > other.f
-    def __lt__(self, other):
-        return self.f < other.f
-    def __ge__(self, other):
-        return self.f >= other.f
-    def __le__(self, other):
-        return self.f <= other.f
-
-    def manhattan(self, dest):
-        """
-        Calculate the estimated cost of moving from self to dest (usually the
-        goal node). If the direction is provided, take that into account.
-        """
-        distance = 0
-
-        x, y = self.position
-        dest_x, dest_y = dest.position
-        dx = x - dest_x
-        dy = y - dest_y
-        if self.direction is not None:
-            if dx == 0:
-                # We're on the same column
-                if self.direction in '<>':
-                    distance += 1000
-                elif self.direction == 'v':
-                    # We'll never be above the goal node, so we're not testing for it.
-                    distance += 2000
-            elif dy == 0:
-                # We're on the same line
-                if self.direction in '^v':
-                    distance += 1000
-                elif self.direction == '<':
-                    # We'll never be right of the goal node, so we're not testing for it.
-                    distance += 2000
-            else:
-                # We're to the left of and below the goal node
-                if self.direction in '^>':
-                    distance += 1000
-                else:
-                    # We have to turn twice
-                    distance += 2000
-
-        return distance + abs(dx) + abs(dy)
-
-    def cost(self, other):
-        """
-        Calculate the cost (g) of moving FROM this node TO position, taking the
-        current direction into account.
-        """
-        cost = 1
-
-        x, y = self.position
-        nx, ny = other
-
-        if x == nx and self.direction in '<>' or \
-           y == ny and self.direction in '^v':
-            cost += 1000
-
-        return cost

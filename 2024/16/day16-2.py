@@ -9,11 +9,19 @@ def main():
         usage()
         sys.exit(1)
 
-    score = data_from_file(filename, analyze_map)
-    print(f"Lowest score: {score}")
+    best_nodes = data_from_file(filename, analyze_map)
+
+    print(f"Number of tiles part of at least one best path: {best_nodes}")
 
 def usage():
     print(f"Usage: python {sys.argv[0]} <filename>")
+
+def count_nodes(paths):
+    best_nodes = set()
+    for path in paths:
+        best_nodes.update(path.keys())
+
+    return best_nodes
 
 def analyze_map(file):
     start = ()
@@ -30,8 +38,9 @@ def analyze_map(file):
     assert len(start) > 0
     assert len(dest) > 0
 
-    score, _ = a_star.solve(grid, start, dest)
-    return score
+    _, paths = a_star.solve_multiple(grid, start, dest)
+
+    return len(count_nodes(paths))
 
 def data_from_file(filename, cb):
     try:
@@ -46,12 +55,12 @@ def data_from_file(filename, cb):
 class TestTopography(unittest.TestCase):
 
     def test_score_1(self):
-        score = data_from_file('example-1.txt', analyze_map)
-        self.assertEqual(score, 7036)
+        best_nodes = data_from_file('example-1.txt', analyze_map)
+        self.assertEqual(best_nodes, 45)
 
     def test_score_2(self):
-        score = data_from_file('example-2.txt', analyze_map)
-        self.assertEqual(score, 11048)
+        best_nodes = data_from_file('example-2.txt', analyze_map)
+        self.assertEqual(best_nodes, 64)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

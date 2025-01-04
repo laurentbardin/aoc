@@ -69,7 +69,7 @@ def solve(grid, start, dest, *, base_g=0, max_score=float('inf')):
             #print(f"g={neighbour.g} h={neighbour.h}")
 
     assert path is None
-    print("No path found!")
+    #print("No path found!")
 
     # No path found
     return float('inf'), None

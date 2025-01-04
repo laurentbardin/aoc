@@ -34,9 +34,12 @@ def analyze_program(file):
         elif line.find("Program") == 0:
             program = line.split(':')[1].splitlines()[0]
 
-    vm.init(a, b, c, program)
+    vm.reset(a, b, c, program)
 
-    return vm.run()
+    output = vm.run()
+    output = ','.join([c for c in map(str, output)])
+
+    return output
 
 def data_from_file(filename, cb):
     try:
@@ -51,7 +54,7 @@ def data_from_file(filename, cb):
 class TestProgram(unittest.TestCase):
 
     def test_program_output(self):
-        result = data_from_file('example.txt', analyze_program)
+        result = data_from_file('example-1.txt', analyze_program)
         self.assertEqual(result, '4,6,3,5,6,3,5,2,1,0')
 
 if __name__ == '__main__':

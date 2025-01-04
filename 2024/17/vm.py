@@ -14,7 +14,7 @@ class Program:
 
     def next(self):
         while self.sp < len(self.instructions) - 1:
-            yield (self.instructions[self.sp], self.instructions[self.sp+1])
+            yield self.instructions[self.sp:self.sp+2]
         
             if not self.update_sp:
                 #print("Not updating SP")
@@ -29,15 +29,16 @@ class VM:
     program: Program = field(default_factory=Program)
     output: list = field(default_factory=list)
 
-    def init(self, a, b, c, program):
+    def reset(self, a, b, c, program):
         self.registers = Register(a, b, c)
         self.program = Program([n for n in map(int, program.split(','))])
+        self.output = []
 
     def run(self):
         for opcode, operand in self.program.next():
             opcodes[opcode](operand)
 
-        return ','.join(self.output)
+        return self.output
 
 vm = VM()
 
@@ -78,7 +79,7 @@ def bxc(operand):
 
 @combo
 def out(operand):
-    vm.output.append(str(operand % 8))
+    vm.output.append(operand % 8)
 
 @combo
 def bdv(operand):

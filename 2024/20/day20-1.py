@@ -40,7 +40,7 @@ def analyze_cpu(file):
 
     # Map time saved to number of shortcuts
     timings = dict()
-    for wall, neighbours in shortcuts.items():
+    for neighbours in shortcuts.values():
         n1, n2 = neighbours
         assert n1 in path
         assert n2 in path

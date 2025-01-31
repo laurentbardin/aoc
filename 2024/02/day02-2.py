@@ -36,7 +36,7 @@ def analyze_report(file):
 def is_safe(report):
     ascending, descending = False, False
 
-    levels = [n for n in map(int, report.split())]
+    levels = list(map(int, report.split()))
 
     # Check the first two levels: if they're equal we can exit early, otherwise
     # we set our expectation about the list sort order (ascending or

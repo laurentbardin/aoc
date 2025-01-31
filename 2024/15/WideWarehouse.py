@@ -172,20 +172,20 @@ class Object:
             case '^':
                 self.y -= 1
             case '>':
-                self.x = tuple([x for x in map(lambda x: x+1, self.x)])
+                self.x = tuple(map(lambda x: x+1, self.x))
             case 'v':
                 self.y += 1
             case '<':
-                self.x = tuple([x for x in map(lambda x: x-1, self.x)])
+                self.x = tuple(map(lambda x: x-1, self.x))
 
     def get_gps_coordinates(self):
         return 0
 
     def get_left_neighbour_x(self):
-        return tuple([x for x in map(lambda x: x-2, self.x)])
+        return tuple(map(lambda x: x-2, self.x))
 
     def get_right_neighbour_x(self):
-        return tuple([x for x in map(lambda x: x+2, self.x)])
+        return tuple(map(lambda x: x+2, self.x))
 
     def get_vertical_neighbours_x(self):
         return [(self.x[0]-1, self.x[0]), (self.x[0], self.x[1]), (self.x[1], self.x[1]+1)]

@@ -78,7 +78,7 @@ class Warehouse:
             warehouse[obj.y][obj.x] = f"{obj}"
 
         for line in warehouse:
-            print(''.join([c for c in map(str, line)]))
+            print(''.join(map(str, line)))
         if legend:
             print(legend)
 

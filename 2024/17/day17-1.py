@@ -37,7 +37,7 @@ def analyze_program(file):
     vm.reset(a, b, c, program)
 
     output = vm.run()
-    output = ','.join([c for c in map(str, output)])
+    output = ','.join(map(str, output))
 
     return output
 

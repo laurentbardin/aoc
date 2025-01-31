@@ -52,7 +52,7 @@ class Area:
                 area[line][column] += 1
 
         for line in area:
-            print(''.join([c for c in map(str, line)]))
+            print(''.join(map(str, line)))
         if legend:
             print(legend)
 

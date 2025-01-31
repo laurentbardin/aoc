@@ -23,7 +23,7 @@ def analyze_memory(grid_width, grid_height, start):
         """
         bytes = list(enumerate(file))
         for line, byte in bytes:
-            x, y = (n for n in map(int, byte.splitlines()[0].split(',')))
+            x, y = map(int, byte.splitlines()[0].split(','))
             grid[y][x] = '#'
 
             if line >= start:

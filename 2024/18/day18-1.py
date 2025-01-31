@@ -17,7 +17,7 @@ def analyze_memory(grid_width, grid_height, size):
 
     def callback(file):
         for line, byte in list(enumerate(file))[:size]:
-            x, y = (n for n in map(int, byte.splitlines()[0].split(',')))
+            x, y = map(int, byte.splitlines()[0].split(','))
             grid[y][x] = '#'
 
         _, path = a_star.solve(grid, (0, 0), (grid_width, grid_height))

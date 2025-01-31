@@ -21,11 +21,11 @@ def analyze_pages(file):
         content = data.strip()
         if content == '':
             break
-        rules.append([n for n in map(int, content.split('|'))])
+        rules.append(list(map(int, content.split('|'))))
 
     for (_, data) in enumerate(file):
         content = data.strip()
-        pages.append([n for n in map(int, content.split(','))])
+        pages.append(list(map(int, content.split(','))))
 
     return check_pages(rules, pages)
 

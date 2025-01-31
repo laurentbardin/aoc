@@ -31,7 +31,7 @@ class VM:
 
     def reset(self, a, b, c, program):
         self.registers = Register(a, b, c)
-        self.program = Program([n for n in map(int, program.split(','))])
+        self.program = Program(list(map(int, program.split(','))))
         self.output = []
 
     def run(self):

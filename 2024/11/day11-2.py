@@ -14,7 +14,7 @@ def usage():
     print(f"Usage: python {sys.argv[0]} <filename>")
 
 def analyze_stones(file):
-    stones = [stone for stone in map(int, file.readline().strip().split())]
+    stones = list(map(int, file.readline().strip().split()))
 
     total = 0
     for (idx, stone) in enumerate(stones):

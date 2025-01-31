@@ -52,7 +52,7 @@ def analyze_program(file):
     in increments of 8**(n-1), for the second to last value, increments of
     8**(n-2), etc.
     """
-    expected_output = [n for n in map(int, program.split(','))]
+    expected_output = list(map(int, program.split(',')))
     #print(f"{expected_output=}")
     n = len(expected_output)
 
@@ -93,7 +93,7 @@ def analyze_program(file):
         else:
             break
 
-    return ','.join([c for c in map(str, output)]), a
+    return ','.join(map(str, output)), a
 
 def data_from_file(filename, cb):
     try:

@@ -21,7 +21,7 @@ def analyze_calibration(file):
 
     for (ln, line) in enumerate(file):
         (value, numbers) = line.split(':')
-        numbers = [n for n in map(int, numbers.split())]
+        numbers = list(map(int, numbers.split()))
         value = int(value)
 
         """ Get the number of possible combinations of + and * """

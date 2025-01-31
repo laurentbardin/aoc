@@ -45,8 +45,8 @@ def solve(eq):
     m = lcm(eq[0][0], eq[1][0])
     factors = [m // eq[0][0], m // eq[1][0]]
 
-    eq[0] = [v for v in map(lambda x: x * factors[0], eq[0])]
-    eq[1] = [v for v in map(lambda x: x * factors[1], eq[1])]
+    eq[0] = list(map(lambda x: x * factors[0], eq[0]))
+    eq[1] = list(map(lambda x: x * factors[1], eq[1]))
     assert eq[0][0] == eq[1][0]
 
     # Check the value are actual integers and not truncated floats

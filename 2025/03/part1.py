@@ -7,7 +7,7 @@ def main():
         usage()
         sys.exit(1)
 
-    total = sum(data_from_file(filename, get_joltage_output))
+    total = data_from_file(filename, get_joltage_output)
     print(f"Total joltage output: {total}")
 
 def usage():
@@ -43,11 +43,11 @@ def get_joltage_output(file):
 
         batteries.append(best)
 
-    return batteries
+    return sum(batteries)
 
-class TestInvalidIDs(unittest.TestCase):
-    def test_invalid_ids(self):
-        total = sum(data_from_file('example.txt', get_joltage_output))
+class TestJoltageOutput(unittest.TestCase):
+    def test_joltage_output(self):
+        total = data_from_file('example.txt', get_joltage_output)
         self.assertEqual(total, 357)
 
 if __name__ == '__main__':

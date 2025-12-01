@@ -7,8 +7,10 @@ def main():
         usage()
         sys.exit(1)
 
-    splits = data_from_file(filename, count_beam_splits)
-    print(f"Number of times the beam will be split: {splits}")
+    # 82 988 107 181 too low
+    # 47 857 642 990 160
+    timelines = data_from_file(filename, count_timelines)
+    print(f"Number of possible timelines: {timelines}")
 
 def usage():
     print(f"Usage: python {sys.argv[0]} <filename>")
@@ -23,18 +25,23 @@ def data_from_file(filename, cb):
         usage()
         sys.exit(1)
 
-def count_beam_splits(file):
+def count_timelines(file):
     grid = []
-    splits = 0
     beam_splits = set()
+    beam_start = None
 
     for y, line in enumerate(file):
         if 'S' in line:
-            beam_splits.add((line.index('S'), y))
+            beam_start = (line.index('S'), y)
         #grid.append([c for c in line.strip()])
         grid.append(line.strip())
 
-    assert len(beam_splits) == 1
+    assert beam_start is not None
+
+    beam_splits.add(beam_start)
+
+    timeline_grid = [[0 for char in line] for line in grid]
+    timeline_grid[beam_start[1]][beam_start[0]] = 1
 
     y = 0
     while y < len(grid) - 1:
@@ -46,24 +53,24 @@ def count_beam_splits(file):
                 # the value of beam[0] ± 1
                 beam_splits.add((beam[0] + 1, next_y))
                 beam_splits.add((beam[0] - 1, next_y))
-                splits += 1
+                left = beam[0] - 1
+                right = beam[0] + 1
+                timeline_grid[next_y][left] += timeline_grid[y][beam[0]]
+                timeline_grid[next_y][right] += timeline_grid[y][beam[0]]
             else:
                 beam_splits.add((beam[0], next_y))
+                timeline_grid[next_y][beam[0]] += timeline_grid[y][beam[0]]
 
             beam_splits.remove(beam)
 
         y += 1
 
-    return splits
+    return sum(timeline_grid[-1])
 
-def debug_grid(grid):
-    for line in grid:
-        print(''.join(line))
-
-class TestBeamSplits(unittest.TestCase):
-    def test_beam_splits(self):
-        splits = data_from_file('example.txt', count_beam_splits)
-        self.assertEqual(splits, 21)
+class TestBeamTimelines(unittest.TestCase):
+    def test_beam_timelines(self):
+        timelines = data_from_file('example.txt', count_timelines)
+        self.assertEqual(timelines, 40)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

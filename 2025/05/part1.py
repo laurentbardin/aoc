@@ -59,7 +59,7 @@ def collapse_ranges(ranges):
     while i < len(ranges) - 1:
         next = ranges[i+1]
 
-        if next.min <= current.max:
+        if next.min <= current.max + 1:
             current = Range(current.min, max(current.max, next.max))
         else:
             collapsed.append(current)
@@ -90,6 +90,11 @@ class TestFreshIngredients(unittest.TestCase):
         ranges = [Range(7, 10), Range(3, 12)]
         collapsed = collapse_ranges(ranges)
         self.assertListEqual(collapsed, [Range(3, 12)])
+
+    def test_range_collapse_close_ranges(self):
+        ranges = [Range(3, 8), Range(9, 13)]
+        collapsed = collapse_ranges(ranges)
+        self.assertListEqual(collapsed, [Range(3, 13)])
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

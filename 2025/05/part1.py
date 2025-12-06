@@ -45,7 +45,7 @@ def count_fresh_ingredients(file):
                 if r.min <= int(rg) <= r.max:
                     fresh_ingredients += 1
         else:
-            low, high = map(int, list(rg.split('-')))
+            low, high = map(int, rg.split('-'))
             fresh_ids.append(Range(low, high))
 
     return fresh_ingredients

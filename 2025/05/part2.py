@@ -37,7 +37,7 @@ def count_fresh_ingredients(file):
         if not rg:
             break
 
-        low, high = map(int, list(rg.split('-')))
+        low, high = map(int, rg.split('-'))
         fresh_ids.append(Range(low, high))
 
     fresh_ids = collapse_ranges(fresh_ids)
